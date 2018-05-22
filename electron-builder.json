@@ -1,0 +1,63 @@
+{
+  "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+  "directories": {
+    "output": "distro"
+  },
+  "extraFiles": [
+    {
+      "from": "resources/platform/base",
+      "to": ".",
+      "filter": [ "**/*" ]
+    }
+  ],
+  "files": [
+    {
+      "filter": [
+        "**",
+        "build/favicon.png",
+        "!test",
+        "!dev.js"
+      ]
+    }
+  ],
+  "afterPack": "./tasks/add-version.js",
+  "win": {
+    "target": [
+      "nsis",
+      "zip"
+    ]
+  },
+  "linux": {
+    "category": "Education",
+    "target": [
+      "tar.gz"
+    ],
+    "extraFiles": [
+      {
+        "from": "resources/platform/linux",
+        "to": ".",
+        "filter": [ "**/*" ]
+      }
+    ]
+  },
+  "fileAssociations": [
+    {
+      "ext": "bpmn",
+      "name": "CamundaModeler.BPMN",
+      "description": "Camunda BPMN file",
+      "role": "Editor"
+    },
+    {
+      "ext": "dmn",
+      "name": "CamundaModeler.DMN",
+      "description": "Camunda DMN file",
+      "role": "Editor"
+    },
+    {
+      "ext": "cmmn",
+      "name": "CamundaModeler.CMMN",
+      "description": "Camunda CMMN file",
+      "role": "Editor"
+    }
+  ]
+}
