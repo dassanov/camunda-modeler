@@ -1,15 +1,9 @@
 {
-  "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+  "appId": "com.camunda.CamundaModeler",
+  "productName": "Camunda Modeler",
   "directories": {
     "output": "distro"
   },
-  "extraFiles": [
-    {
-      "from": "resources/platform/base",
-      "to": ".",
-      "filter": [ "**/*" ]
-    }
-  ],
   "files": [
     {
       "filter": [
@@ -20,7 +14,7 @@
       ]
     }
   ],
-  "afterPack": "./tasks/add-version.js",
+  "afterPack": "./tasks/copy-assets.js",
   "win": {
     "target": [
       "nsis",
@@ -28,35 +22,28 @@
     ]
   },
   "linux": {
-    "category": "Education",
+    "category": "Development",
     "target": [
       "tar.gz"
-    ],
-    "extraFiles": [
-      {
-        "from": "resources/platform/linux",
-        "to": ".",
-        "filter": [ "**/*" ]
-      }
     ]
   },
   "fileAssociations": [
     {
       "ext": "bpmn",
       "name": "CamundaModeler.BPMN",
-      "description": "Camunda BPMN file",
+      "description": "BPMN file",
       "role": "Editor"
     },
     {
       "ext": "dmn",
       "name": "CamundaModeler.DMN",
-      "description": "Camunda DMN file",
+      "description": "DMN file",
       "role": "Editor"
     },
     {
       "ext": "cmmn",
       "name": "CamundaModeler.CMMN",
-      "description": "Camunda CMMN file",
+      "description": "CMMN file",
       "role": "Editor"
     }
   ]

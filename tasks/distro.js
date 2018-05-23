@@ -1,5 +1,21 @@
 #!/usr/bin/env node
-const argv = require('yargs').argv
+
+const argv = require('yargs')
+  .option('nightly', {
+    describe: 'build nightly distro',
+    type: 'boolean'
+  })
+  .option('publish', {
+    describe: 'publish distro',
+    type: 'boolean'
+  })
+  .option('targets', {
+    describe: 'target platforms to build distributions for',
+    coerce: function(val) {
+      return val.split(/,/g);
+    }
+  })
+  .argv;
 
 const exec = require('execa').sync;
 
@@ -12,46 +28,84 @@ const {
   publish
 } = argv;
 
-const availablePlatforms = {
-  win: 1,
-  linux: 1,
-  mac: 1
-};
 
-var nightlyOptions = [];
+let artifactOptions = [
+  '-c.artifactName=${name}-${version}-${os}-${arch}.${ext}',
+  '-c.dmg.artifactName=${name}-${version}-${os}.${ext}',
+  '-c.nsis.artifactName=${name}-${version}-${os}-setup.${ext}',
+  '-c.nsisWeb.artifactName=${name}-${version}-${os}-web-setup.${ext}'
+];
 
-let nightlyVersion = nightly && getVersion(pkg, nightly && {
+let nightlyVersion = nightly && getVersion(pkg, {
   nightly: 'nightly'
 });
 
 if (nightlyVersion) {
 
-  nightlyOptions = [
-    `-c.buildVersion=${nightlyVersion}`,
-    '-c.artifactName=${productName}-${os}-${arch}.${ext}'
+  artifactOptions =
+    artifactOptions.map(s => s.replace('${version}', 'nightly'));
+
+  const publishNightlyArgs = [
+    'publish',
+    `--repo-version=${nightlyVersion}`,
+    '--skip-npm',
+    '--skip-git',
+    '--yes'
   ];
+
+  console.log(`
+Setting ${pkg.name} version to nightly
+
+---
+
+lerna ${ publishNightlyArgs.join(' ') }
+
+---
+`);
+
+  exec('lerna', publishNightlyArgs, {
+    stdio: 'inherit'
+  });
 }
 
-const platforms =
-  Object.keys(availablePlatforms)
-    .map(k => argv[k] && k)
-    .filter(k => k);
+// interpret shorthand target options
+// --win, --linux, --mac(os)
+const platforms = argv.targets || [
+  argv.win ? 'win' : null,
+  argv.linux ? 'linux': null,
+  (argv.macos || argv.mac) ? 'macos' : null
+].filter(f => f);
 
 const platformOptions = platforms.map(p => `--${p}`);
 
-const publishOptions = publish ? [ '--publish=always' ] : [];
+const publishOptions = typeof publish !== undefined ? [
+  `--publish=${ publish ? 'always' : 'never' }`
+] : [];
+
+const signingOptions = [
+  `-c.forceCodeSigning=${publish}`
+];
+
+const archOptions = 'x64' in argv ? [ '--x64' ] : [
+  '--ia32',
+  '--x64',
+];
 
 const args = [
+  ...archOptions,
+  ...signingOptions,
   ...platformOptions,
-  ...nightlyOptions,
-  ...publishOptions
+  ...publishOptions,
+  ...artifactOptions
 ];
 
 console.log(`
 Building ${pkg.name} distro
 
+---
+
   version: ${nightlyVersion || pkg.version}
-  platforms: [${ platforms }]
+  platforms: [${ platforms.length && platforms || 'current' }]
   publish: ${publish || false}
 
 ---
