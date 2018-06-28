@@ -73,7 +73,7 @@ lerna ${ publishNightlyArgs.join(' ') }
 const platforms = argv.targets || [
   argv.win ? 'win' : null,
   argv.linux ? 'linux': null,
-  (argv.macos || argv.mac) ? 'macos' : null
+  argv.mac ? 'macos' : null
 ].filter(f => f);
 
 const platformOptions = platforms.map(p => `--${p}`);
