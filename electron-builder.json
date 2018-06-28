@@ -32,19 +32,22 @@
       "ext": "bpmn",
       "name": "CamundaModeler.BPMN",
       "description": "BPMN file",
-      "role": "Editor"
+      "role": "Editor",
+      "mimeType": "application/bpmn"
     },
     {
       "ext": "dmn",
       "name": "CamundaModeler.DMN",
       "description": "DMN file",
-      "role": "Editor"
+      "role": "Editor",
+      "mimeType": "application/dmn"
     },
     {
       "ext": "cmmn",
       "name": "CamundaModeler.CMMN",
       "description": "CMMN file",
-      "role": "Editor"
+      "role": "Editor",
+      "mimeType": "application/cmmn"
     }
   ]
 }
