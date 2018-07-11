@@ -1,13 +1,13 @@
 const fs = require('fs');
 const path = require('path');
 
-module.exports = function(bundle) {
+module.exports = function(context) {
 
   const {
     appOutDir
-  } = bundle;
+  } = context;
 
-  const appInfo = bundle.packager.appInfo;
+  const appInfo = context.packager.appInfo;
 
   const {
     buildVersion,

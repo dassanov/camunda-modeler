@@ -1,11 +1,11 @@
 const { copySync } = require('cpx');
 
-module.exports = function(bundle) {
+module.exports = function(context) {
 
   const {
     appOutDir,
     electronPlatformName
-  } = bundle;
+  } = context;
 
   copySync('resources/platform/base/**', appOutDir);
   copySync(`resources/platform/${electronPlatformName}/**`, appOutDir);

@@ -14,7 +14,7 @@
       ]
     }
   ],
-  "afterPack": "./tasks/copy-assets.js",
+  "afterPack": "./tasks/after-pack.js",
   "win": {
     "target": [
       "nsis",
