@@ -1,21 +1,6 @@
 #!/usr/bin/env node
 
-const argv = require('yargs')
-  .option('nightly', {
-    describe: 'build nightly distro',
-    type: 'boolean'
-  })
-  .option('publish', {
-    describe: 'publish distro',
-    type: 'boolean'
-  })
-  .option('targets', {
-    describe: 'target platforms to build distributions for',
-    coerce: function(val) {
-      return val.split(/,/g);
-    }
-  })
-  .argv;
+const argv = require('yargs').argv;
 
 const exec = require('execa').sync;
 
@@ -28,22 +13,11 @@ const {
   publish
 } = argv;
 
-
-let artifactOptions = [
-  '-c.artifactName=${name}-${version}-${os}-${arch}.${ext}',
-  '-c.dmg.artifactName=${name}-${version}-${os}.${ext}',
-  '-c.nsis.artifactName=${name}-${version}-${os}-setup.${ext}',
-  '-c.nsisWeb.artifactName=${name}-${version}-${os}-web-setup.${ext}'
-];
-
 let nightlyVersion = nightly && getVersion(pkg, {
   nightly: 'nightly'
 });
 
 if (nightlyVersion) {
-
-  artifactOptions =
-    artifactOptions.map(s => s.replace('${version}', 'nightly'));
 
   const publishNightlyArgs = [
     'publish',
@@ -68,12 +42,23 @@ lerna ${ publishNightlyArgs.join(' ') }
   });
 }
 
+const replaceVersion = nightlyVersion
+  ? s => s.replace('${version}', 'nightly')
+  : s => s;
+
+const artifactOptions = [
+  '-c.artifactName=${name}-${version}-${os}-${arch}.${ext}',
+  '-c.dmg.artifactName=${name}-${version}-${os}.${ext}',
+  '-c.nsis.artifactName=${name}-${version}-${os}-setup.${ext}',
+  '-c.nsisWeb.artifactName=${name}-${version}-${os}-web-setup.${ext}'
+].map(replaceVersion);
+
 // interpret shorthand target options
-// --win, --linux, --mac(os)
-const platforms = argv.targets || [
+// --win, --linux, --mac
+const platforms = [
   argv.win ? 'win' : null,
   argv.linux ? 'linux': null,
-  argv.mac ? 'macos' : null
+  argv.mac ? 'mac' : null
 ].filter(f => f);
 
 const platformOptions = platforms.map(p => `--${p}`);
@@ -86,10 +71,7 @@ const signingOptions = [
   `-c.forceCodeSigning=${publish}`
 ];
 
-const archOptions = 'x64' in argv ? [ '--x64' ] : [
-  '--ia32',
-  '--x64',
-];
+const archOptions = [ 'x64', 'ia32' ].filter(a => argv[a]).map(a => `--${a}`);
 
 const args = [
   ...archOptions,
