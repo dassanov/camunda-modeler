@@ -30,9 +30,11 @@
     "url": "https://github.com/camunda/camunda-modeler"
   },
   "devDependencies": {
+    "archiver": "^2.1.1",
     "chai": "^4.1.2",
     "cpx": "^1.5.0",
     "decompress": "^4.2.0",
+    "del": "^3.0.0",
     "del-cli": "^1.1.0",
     "electron": "^2.0.2",
     "electron-builder": "^20.17.0",

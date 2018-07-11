@@ -1,3 +1,9 @@
+const del = require('del').sync;
+
+const archiver = require('archiver');
+
+const fs = require('fs');
+
 /**
  * An initializer that extends electron-builder to
  * suite our needs:
@@ -20,25 +26,39 @@ module.exports = function registerArchiveHook(context) {
     platform
   } = packager;
 
-  console.log('AFTER PACK');
+  if (packager.__extended) {
+    return;
+  }
+
+  packager.__extended = true;
 
   targets.forEach(function(target) {
 
-    let fn = function() { };
+    postBuild(target, async function(outDir, arch) {
 
-    if (target.name === 'tar.gz' && platform.name === 'linux') {
-      fn = function() {
-        console.log('RENAME target contents');
-      };
-    }
+      const platformName = platform.name === 'windows' ? 'win' : platform.name;
+      const targetName = target.name;
 
-    if (target.name === 'zip' && platform.name === 'windows') {
-      fn = function() {
-        console.log('WRAP archive contents in directory');
-      };
-    }
+      const artifactName = packager.expandArtifactNamePattern(
+        target.options, targetName, arch, 'NOOP', false
+      );
 
-    postBuild(target, fn);
+      const unpackedPath =
+        `distro/${ platformName }-${ arch === 0 ? 'ia32-' : ''}unpacked`;
+
+      const archivePath = `distro/${artifactName}`;
+
+      // Linux + Mac distro
+      if (targetName === 'tar.gz') {
+        await archive(unpackedPath, archivePath, 'tar.gz');
+      }
+
+      // Windows distro
+      if (targetName === 'zip' && platformName === 'win') {
+        await archive(unpackedPath, archivePath, 'zip');
+      }
+    });
+
   });
 
 };
@@ -56,4 +76,42 @@ function postBuild(target, fn) {
 
     await fn(appOutDir, arch);
   };
+}
+
+
+async function archive(path, archivePath, archiveType) {
+
+  console.log(`  • re-building     file=${archivePath}, archiveType=${archiveType}`);
+
+
+  return new Promise(function(resolve, reject) {
+
+    del(archivePath);
+
+    var archive,
+        output;
+
+    if (archiveType === 'zip') {
+      archive = archiver('zip', {
+        zlib: {
+          level: 9
+        }
+      });
+    } else {
+      archive = archiver('tar', {
+        gzip: true,
+        gzipOptions: {
+          level: 9
+        }
+      });
+    }
+
+    output = fs.createWriteStream(archivePath);
+
+    archive.pipe(output);
+    archive.on('end', resolve);
+    archive.on('error', reject);
+
+    archive.directory(path, 'camunda-modeler').finalize();
+  });
 }
