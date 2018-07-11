@@ -17,14 +17,30 @@
   "afterPack": "./tasks/after-pack.js",
   "win": {
     "target": [
-      "nsis",
-      "zip"
+      {
+        "target": "nsis",
+        "arch": [ "x64" ]
+      },
+      {
+        "target": "zip",
+        "arch": [ "x64", "ia32" ]
+      }
     ]
   },
   "linux": {
     "category": "Development",
     "target": [
-      "tar.gz"
+      {
+        "target": "tar.gz",
+        "arch": [ "x64", "ia32" ]
+      }
+    ]
+  },
+  "mac": {
+    "target": [
+      "dmg",
+      "tar.gz",
+      "zip"
     ]
   },
   "fileAssociations": [

@@ -68,8 +68,13 @@ const publishOptions = typeof publish !== undefined ? [
 ] : [];
 
 const signingOptions = [
-  `-c.forceCodeSigning=${publish}`
+  `-c.forceCodeSigning=${!!publish}`
 ];
+
+if (argv.ia32 || argv.x64) {
+  console.error('Do not override arch; is manually pinned');
+  process.exit(1);
+}
 
 const archOptions = [ 'x64', 'ia32' ].filter(a => argv[a]).map(a => `--${a}`);
 
