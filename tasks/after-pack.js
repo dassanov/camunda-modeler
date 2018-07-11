@@ -1,4 +1,5 @@
 const handlers = [
+  require('./after-pack/register-archive-hook'),
   require('./after-pack/add-version'),
   require('./after-pack/add-platform-files')
 ];
