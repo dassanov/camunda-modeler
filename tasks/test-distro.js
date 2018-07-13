@@ -41,10 +41,10 @@ const expectedFiles = {
 
 const expectedContents = {
   win: [
-    'camunda-modeler/Camunda Modeler.exe'
+    'Camunda Modeler.exe'
   ],
   linux: [
-    'camunda-modeler/camunda-modeler'
+    'camunda-modeler-${version}-linux-ia32/camunda-modeler'
   ],
   mac: [
     'Camunda Modeler.app'
@@ -68,20 +68,22 @@ verifyArchives(platforms, version).then(
 
 async function verifyArchives(platforms, version) {
 
+  function replaceVersion(name) {
+    return name.replace('${version}', version);
+  }
+
   const distroDir = path.join(__dirname, '../distro');
 
   for (const platform of platforms) {
 
-    const distributableNames = expectedFiles[platform].map((name) => {
-      return name.replace('${version}', version);
-    });
+    const distributableNames = expectedFiles[platform].map(replaceVersion);
 
     console.log(`Verifying <${platform}> distributables`);
     console.log();
 
     for (const name of distributableNames) {
 
-      const archivePath = `${distroDir}/${name}`;
+      const archivePath = `${distroDir}/${replaceVersion(name)}`;
 
       console.log(` - ${name}`);
 

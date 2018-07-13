@@ -50,12 +50,12 @@ module.exports = function registerArchiveHook(context) {
 
       // Linux + Mac distro
       if (targetName === 'tar.gz') {
-        await archive(unpackedPath, archivePath, 'tar.gz');
+        // await archive(unpackedPath, archivePath, 'tar.gz');
       }
 
       // Windows distro
       if (targetName === 'zip' && platformName === 'win') {
-        await archive(unpackedPath, archivePath, 'zip');
+        // await archive(unpackedPath, archivePath, 'zip');
       }
     });
 
